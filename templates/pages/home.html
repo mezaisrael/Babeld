@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+Welcome to Tweet 2
+
+<div id='tweets'>
+
+</div>
+
+<script>
+
+    const tweetElement = document.getElementById('tweets')
+    tweetElement.innerHTML = "Loading..."
+
+    const xhr = new XMLHttpRequest()
+    const method = 'GET'
+    const url = '/tweets'
+    const responseType = 'json'
+
+    xhr.responseType = responseType
+    xhr.open(method, url)
+    xhr.onload = function() {
+        console.log(xhr.response.response)
+    }
+    xhr.send()
+</script>
+{% endblock content %}

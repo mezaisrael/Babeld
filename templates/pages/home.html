@@ -12,8 +12,11 @@
     <div class="col-10 col-md4 mx-auto">
         <form class="form" id="tweet-create-form" method="POST" action="create-tweet">
             {% csrf_token %}
+            <div class="d-none alert alert-danger" id='tweet-create-form-error'></div>
             <input type="hidden" value="/" name="next"/>
-            <textarea class="form-control"
+            <textarea
+                class="form-control"
+                required='required'
                 name="content"
                 placeholder="Your Tweet..."></textarea>
             <button class="btn btn-primary" type="submit">Tweet</button>
@@ -40,13 +43,36 @@
         xhr.setRequestHeader("HTTP_x_REQUESTED_WITH", "XMLHttpRequest")
         xhr.setRequestHeader("X-REQUESTED-With", "XMLHttpRequest")
         xhr.onload = function() {
-            if (xhr.status == 201) {
+            if (xhr.status === 201) {
+                handleTweetFormError("", false)
                 const newTweetJson = xhr.response
                 const newTweetEl = formatTweetElement(newTweetJson)
                 const ogHtml = tweetContainerEl.innerHTML
                 tweetContainerEl.innerHTML = newTweetEl + ogHtml
+                myForm.reset()
+            } else if (xhr.status === 400) {
+                const errorJson = xhr.response
+                const contentError = errorJson.content
+                let contentErrorMsg
+
+                if (contentError) {
+                    contentErrorMsg = contentError[0]
+                    if (contentErrorMsg) {
+                        handleTweetFormError(contentErrorMsg, true)
+                    } else {
+                        alert('An error occured')
+                    }
+                } else {
+                    alert('An error occured')
+                }
+
+            } else if (xhr.status === 500)  {
+                alert('There was a server error, please try again later')
             }
-            {% comment %} loadTweet(tweetEl) {% endcomment %}
+
+        }
+        xhr.onerror = function () {
+            alert('An error occured. Please try again')
         }
         xhr.send(myFormData)
     }
@@ -55,8 +81,17 @@
 
     const tweetContainerEl = document.getElementById('tweets')
 
+    function handleTweetFormError(msg, display) {
+        var myErrorDiv = document.getElementById('tweet-create-form-error')
+        if (display === true) {
+            //show error        
+            myErrorDiv.setAttribute('class', 'd-block alert alert-danger')
+            myErrorDiv.innerHTML = msg
+        } else {
+            myErrorDiv.setAttribute('class', 'd-none alert alert-danger')
+        }
+    }
      
-
     function handleDidLike(tweet_id, currentCount) {
         console.log(tweet_id, currentCount)
         currentCount++

@@ -26,6 +26,7 @@ SECRET_KEY = ***REMOVED***
 DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '.mydomain']
+LOGIN_URL = '/login'
 
 
 # Application definition

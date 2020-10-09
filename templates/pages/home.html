@@ -66,6 +66,12 @@
                     alert('An error occured')
                 }
 
+            } else if (xhr.status === 401)  {
+                alert('You must login')
+                window.location.href('/login')
+            } else if (xhr.status === 403)  {
+                alert('You must login')
+                window.location.href('/login')
             } else if (xhr.status === 500)  {
                 alert('There was a server error, please try again later')
             }
@@ -102,14 +108,13 @@
         return "<button " +
             "class='btn btn-primary' " +
             "onclick='handleDidLike(" + tweet.id + ", "  + tweet.likes +
-            ")'>Like</button>"
+            ")'>" + tweet.likes + "Like</button>"
     }
 
     function formatTweetElement(tweetObj) {
         var formatedTweet =
             "<div class='col-12 col-md-10 mx-auto" + 
                 "border radius py-3 mb-4 tweet' id='tweet-id'>" +
-            "<h1>" + tweetObj.id + "</h1>" +
             "<p>" + tweetObj.content + "</p>" +
             "<div class='btn-group'>" + likeBtn(tweetObj) + "</div>" +
             "</div>"
@@ -126,7 +131,7 @@
         xhr.responseType = responseType
         xhr.open(method, url)
         xhr.onload = function() {
-            const listedItems = xhr.response.response
+            const listedItems = xhr.response
             var finalTweetStr = ''
             for (let i = 0; i < listedItems.length; i++) {
                 var currentItem = formatTweetElement(listedItems[i])

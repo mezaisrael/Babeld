@@ -14,7 +14,7 @@ class TweetActionSerializer(serializers.Serializer):
     def validate_action(self, value):
         value.lower().strip()
         if not value in TWEET_ACTION_OPTIONS:
-            raise serializers \
+            raise serializers\
                 .ValidationError('This is not a valid action for tweets')
         return value
 
@@ -45,7 +45,7 @@ class TweetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tweets
         fields = ['id', 'content', 'likes', 'is_retweet', 'parent']
-    
+
 
     def get_likes(self, obj):
         return obj.likes.count()

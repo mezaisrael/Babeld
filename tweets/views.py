@@ -10,7 +10,11 @@ from rest_framework.permissions import IsAuthenticated
 
 from .models import Tweets
 from .forms import TweetForm
-from .serializers import TweetSerializer
+from .serializers import (
+    TweetSerializer,
+    TweetActionSerializer,
+    TweetCreateSerializer
+)
 
 ALLOWED_HOSTS = settings.ALLOWED_HOSTS
 
@@ -26,7 +30,7 @@ def tweet_create_view(request, *args, **kwargs):
     '''
     rest framework
     '''
-    serializer = TweetSerializer(data=request.POST)
+    serializer = TweetCreateSerializer(data=request.POST)
     if serializer.is_valid():
         serializer.save(user=request.user)
         return Response(serializer.data, status=201)
@@ -46,11 +50,47 @@ def tweet_detail_view(request, tweet_id, *args, **kwargs):
     return Response(serializer.data, status=200)
 
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def tweet_action_view(request, *args, **kwargs):
+    '''
+    Action options are: like, unlike, retweet
+    '''
+    serializer = TweetActionSerializer(data=request.data)
+    if serializer.is_valid(raise_exception=True):
+        data = serializer.validated_data
+        tweet_id = data.get('id')
+        action = data.get('action')
+        content = data.get('content')
+
+    qs = Tweets.objects.filter(id=tweet_id)
+
+    if not qs.exists():
+        return Response({}, status=404)
+
+    obj = qs.first()
+
+    if action == 'like':
+        obj.likes.add(request.user)
+        serializer = TweetSerializer(qs, many=True)
+        return Response(serializer.data, status=200)
+    if action == 'unlike':
+        obj.likes.remove(request.user)
+    elif action == 'retweet':
+        newTweet = Tweets.objects.create(
+            user=request.user,
+            parent=obj,
+            content=content)
+        serializer = TweetSerializer(newTweet)
+        return Response(serializer.data, status=200)
+
+    return Response({}, status=200)
+
+
 @api_view(['DELETE', 'POST'])
 @permission_classes([IsAuthenticated])
 def tweet_delete_view(request, tweet_id, *args, **kwargs):
     qs = Tweets.objects.filter(id=tweet_id)
-    print('hello')
 
     if not qs.exists():
         return Response({}, status=404)

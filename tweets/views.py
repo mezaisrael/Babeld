@@ -84,7 +84,7 @@ def tweet_action_view(request, *args, **kwargs):
             parent=obj,
             content=content)
         serializer = TweetSerializer(newTweet)
-        return Response(serializer.data, status=200)
+        return Response(serializer.data, status=201)
 
     return Response({}, status=200)
 
@@ -96,7 +96,8 @@ def tweet_delete_view(request, tweet_id, *args, **kwargs):
 
     if not qs.exists():
         return Response({}, status=404)
-    qs.filter(user=request.user)
+
+    qs = qs.filter(user=request.user)
     if not qs.exists():
         return Response({"message": "your cannot delete this tweet"}, status=401)
 

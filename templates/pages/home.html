@@ -117,30 +117,25 @@
      
     function handleActionBtn(tweet_id, currentCount, action) {
         console.log(tweet_id, currentCount)
-        const url = 'api/tweets/action'
-        const method = 'POST'
+        const url = "/api/tweets/action/"
+        const method="POST"
         const data = JSON.stringify({
             id: tweet_id,
             action: action
         })
-
         const xhr = new XMLHttpRequest()
-        xhr.open(method, url)
-
-        xhr.setRequestHeader("Content-Type", "application/json")
-        xhr.setRequestHeader("HTTP_x_REQUESTED_WITH", "XMLHttpRequest")
-        xhr.setRequestHeader("X-REQUESTED-With", "XMLHttpRequest")
         const csrftoken = getCookie('csrftoken');
+        xhr.open(method, url)
+        xhr.setRequestHeader("Content-Type", "application/json")
+        xhr.setRequestHeader("HTTP_X_REQUESTED_WITH", "XMLHttpRequest")
+        xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest")
         xhr.setRequestHeader("X-CSRFToken", csrftoken)
-
-        xhr.onload = function () {
-            console.log(xhr.status, xhr.response)
-            loadTweet(tweetContainerEl)
+        xhr.onload = function() {
+            // react.js this handle the state much better
+            loadTweets(tweetContainerEl)
         }
-        
         xhr.send(data)
-
-        return
+        return 
     }
 
 
@@ -169,10 +164,12 @@
 
 
     function formatTweetElement(tweetObj) {
+        content = tweetObj.is_retweet ? tweetObj.parent.content :
+            tweetObj.content
         var formatedTweet =
             "<div class='col-12 col-md-10 mx-auto"              + 
                 "border radius py-3 mb-4 tweet' id='tweet-id'>" +
-                "<p>" + tweetObj.content + "</p>"               +
+                "<p>" + content + "</p>"               +
                 "<div class='btn-group'>"                       + 
                     likeBtn(tweetObj)                           +
                     unLikeBtn(tweetObj)                         +
@@ -184,7 +181,7 @@
     }
 
 
-    function loadTweet(tweetElement) {
+    function loadTweets(tweetElement) {
         const xhr = new XMLHttpRequest()
         const method = 'GET'
         const url = '/tweets'
@@ -204,7 +201,7 @@
         xhr.send()
     }
 
-    loadTweet(tweetContainerEl)
+    loadTweets(tweetContainerEl)
 
 </script>
 {% endblock content %}

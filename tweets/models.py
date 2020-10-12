@@ -26,4 +26,3 @@ class Tweets(models.Model):
     def is_retweet(self):
         return self.parent != None
 
-
